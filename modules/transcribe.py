@@ -19,16 +19,12 @@ def download_audio(youtube_url):
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": f"{tempfile.gettempdir()}/%(id)s.%(ext)s",
-        "postprocessors": [{
-            "key": "FFmpegCopyAudio",
-            "preferredcodec": "mp3",
-            "preferredquality": "128",
-        }],
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
         video_id = info.get("id")
-    return Path(f"{video_id}.mp3"), info.get("title", video_id)
+        filename = ydl.prepare_filename(info)
+    return Path(filename), info.get("title", video_id)
 
 def split_audio(input_file, minutes=10):
     print("[Split] Splitting audio...")
