@@ -26,7 +26,7 @@ def download_audio(youtube_url):
         filename = ydl.prepare_filename(info)
     return Path(filename), info.get("title", video_id)
 
-def split_audio(input_file, minutes=10):
+def split_audio(input_file, minutes=60):
     print("[Split] Splitting audio...")
     audio = AudioSegment.from_file(input_file)
     chunk_ms = minutes * 60 * 1000
