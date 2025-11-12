@@ -23,8 +23,6 @@ def download_audio(youtube_url):
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
             "preferredquality": "128",
-            # "overwrites": False,
-            "skip_download": True,
         }],
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
