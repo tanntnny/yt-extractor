@@ -10,7 +10,7 @@ import whisper
 import yt_dlp
 
 MODEL_SIZE = "small"
-CHUNK_MINUTES = 10
+CHUNK_MINUTES = 60
 OUTPUT_DIR = Path("outputs")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
