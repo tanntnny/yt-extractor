@@ -55,9 +55,12 @@ def save_transcript(text, title):
     out_path.write_text(text, encoding="utf-8")
     print(f"[Done] Transcript saved to {out_path.resolve()}")
 
-def main(youtube_url):
+def main(youtube_url, split_minutes=None):
     audio_path, title = download_audio(youtube_url)
-    chunks = split_audio(audio_path, CHUNK_MINUTES)
+    if split_minutes == 0:
+        chunks = [audio_path]
+    else:
+        chunks = split_audio(audio_path, split_minutes or CHUNK_MINUTES)
     transcript_text = transcribe_chunks(chunks, MODEL_SIZE)
     save_transcript(transcript_text, title)
 
@@ -70,6 +73,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Transcribe YouTube videos using Whisper")
     parser.add_argument("url", nargs="?", help="Single YouTube URL to transcribe")
     parser.add_argument("--src", help="Path to JSON file containing list of YouTube URLs")
+    parser.add_argument("--split", type=int, default=0, help="Minutes per audio chunk (0 to disable splitting)")
     
     args = parser.parse_args()
     
@@ -83,9 +87,9 @@ if __name__ == "__main__":
             print(f"\n{'='*60}")
             print(f"[{idx}/{len(urls)}] Processing: {url}")
             print(f"{'='*60}")
-            main(url)
+            main(url, args.split)
     elif args.url:
-        main(args.url)
+        main(args.url, args.split)
     else:
         parser.print_help()
         sys.exit(1)
