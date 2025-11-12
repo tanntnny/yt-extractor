@@ -18,7 +18,7 @@ def download_audio(youtube_url):
     print(f"[Download] {youtube_url}")
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": f"{tempfile.gettempdir()}/%(id)s.%(ext)s"
+        "outtmpl": f"{tempfile.gettempdir()}/%(id)s.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegCopyStream",
             "preferredcodec": "mp3",
