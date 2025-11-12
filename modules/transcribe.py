@@ -20,7 +20,7 @@ def download_audio(youtube_url):
         "format": "bestaudio/best",
         "outtmpl": f"{tempfile.gettempdir()}/%(id)s.%(ext)s",
         "postprocessors": [{
-            "key": "FFmpegExtractAudio",
+            "key": "FFmpegCopyAudio",
             "preferredcodec": "mp3",
             "preferredquality": "128",
         }],
