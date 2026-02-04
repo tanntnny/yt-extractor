@@ -19,6 +19,14 @@ def download_audio(youtube_url):
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": f"{tempfile.gettempdir()}/%(id)s.%(ext)s",
+        "nocheckcertificate": True,
+        "quiet": True,
+        "no_warnings": True,
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "web"]
+            }
+        }
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
