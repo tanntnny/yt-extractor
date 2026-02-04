@@ -7,6 +7,7 @@ from pathlib import Path
 from pydub import AudioSegment
 from tqdm import tqdm
 import whisper
+import torch
 import yt_dlp
 
 MODEL_SIZE = "small"
@@ -48,9 +49,13 @@ def split_audio(input_file, minutes=60):
     print(f"[Split] Created {len(chunks)} chunks.")
     return chunks
 
-def transcribe_chunks(chunks, model_size="base"):
+def transcribe_chunks(chunks, model_size="base", use_gpu=False):
+    if use_gpu and not torch.cuda.is_available():
+        print("Error: --gpu was set but CUDA is not available on this system.")
+        sys.exit(1)
     print(f"[Model] Loading Whisper ({model_size}) ...")
-    model = whisper.load_model(model_size)
+    device = "cuda" if use_gpu else "cpu"
+    model = whisper.load_model(model_size, device=device)
     full_text = []
     for i, chunk_path in enumerate(tqdm(chunks, desc="Transcribing chunks")):
         result = model.transcribe(str(chunk_path))
@@ -63,13 +68,13 @@ def save_transcript(text, title):
     out_path.write_text(text, encoding="utf-8")
     print(f"[Done] Transcript saved to {out_path.resolve()}")
 
-def main(youtube_url, split_minutes=None):
+def main(youtube_url, split_minutes=None, use_gpu=False):
     audio_path, title = download_audio(youtube_url)
     if split_minutes == 0:
         chunks = [audio_path]
     else:
         chunks = split_audio(audio_path, split_minutes or CHUNK_MINUTES)
-    transcript_text = transcribe_chunks(chunks, MODEL_SIZE)
+    transcript_text = transcribe_chunks(chunks, MODEL_SIZE, use_gpu=use_gpu)
     save_transcript(transcript_text, title)
 
 def load_urls_from_json(json_path):
@@ -82,6 +87,7 @@ if __name__ == "__main__":
     parser.add_argument("url", nargs="?", help="Single YouTube URL to transcribe")
     parser.add_argument("--src", help="Path to JSON file containing list of YouTube URLs")
     parser.add_argument("--split", type=int, default=0, help="Minutes per audio chunk (0 to disable splitting)")
+    parser.add_argument("--gpu", action="store_true", help="Force GPU (CUDA) for transcription")
     
     args = parser.parse_args()
     
@@ -95,9 +101,9 @@ if __name__ == "__main__":
             print(f"\n{'='*60}")
             print(f"[{idx}/{len(urls)}] Processing: {url}")
             print(f"{'='*60}")
-            main(url, args.split)
+            main(url, args.split, use_gpu=args.gpu)
     elif args.url:
-        main(args.url, args.split)
+        main(args.url, args.split, use_gpu=args.gpu)
     else:
         parser.print_help()
         sys.exit(1)
