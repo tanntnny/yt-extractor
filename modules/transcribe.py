@@ -87,7 +87,7 @@ if __name__ == "__main__":
     parser.add_argument("url", nargs="?", help="Single YouTube URL to transcribe")
     parser.add_argument("--src", help="Path to JSON file containing list of YouTube URLs")
     parser.add_argument("--split", type=int, default=0, help="Minutes per audio chunk (0 to disable splitting)")
-    parser.add_argument("--gpu", action="store_true", help="Force GPU (CUDA) for transcription")
+    parser.add_argument("--gpu", action="store_true", help="Force GPU (CUDA) for the transcription")
     
     args = parser.parse_args()
     
